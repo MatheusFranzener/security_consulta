@@ -1,7 +1,9 @@
 package br.senai.sc.security_consulta.controller;
 
 
+import br.senai.sc.security_consulta.model.dto.LivroDTO;
 import br.senai.sc.security_consulta.model.dto.UsuarioDTO;
+import br.senai.sc.security_consulta.model.entities.Livro;
 import br.senai.sc.security_consulta.model.entities.Usuario;
 import br.senai.sc.security_consulta.service.UsuarioService;
 import jakarta.validation.Valid;
@@ -26,7 +28,7 @@ public class UsuarioController {
     public ResponseEntity<Object> findByEmail(@PathVariable(value = "email") String email) {
         Optional<Usuario> pessoaOptional = pessoaService.findByEmail(email);
 
-        if (pessoaOptional.isEmpty()){
+        if (pessoaOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não foi encontrada nenhuma pessoa com este E-mail");
         }
 
@@ -47,36 +49,37 @@ public class UsuarioController {
 
     @PostMapping
     public ResponseEntity<Object> save(@RequestBody @Valid UsuarioDTO pessoaDTO) {
-        if (pessoaService.existsByEmail(pessoaDTO.getEmail())){
+        if (pessoaService.existsByEmail(pessoaDTO.getEmail())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Este E-mail já está cadastrado.");
         }
 
         Usuario pessoa = new Usuario();
         BeanUtils.copyProperties(pessoaDTO, pessoa);
-//        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-//        pessoa.setSenha(encoder.encode(pessoa.getSenha()));
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(pessoaService.save(pessoa));
+
+        return ResponseEntity.status(HttpStatus.OK).body(pessoaService.save(pessoa));
     }
-//    @PostMapping
-//    public String save(PessoaDTO pessoaDTO) {
-//        Pessoa pessoa = new Pessoa();
-//        BeanUtils.copyProperties(pessoaDTO, pessoa);
-//        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-//        pessoa.setSenha(encoder.encode(pessoa.getSenha()));
-//        pessoaService.save(pessoa);
-//        return "home";
-//    }
 
     @DeleteMapping("/{cpf}")
     public ResponseEntity<Object> deleteById(@PathVariable(value = "cpf") Long cpf) {
-        if (!pessoaService.existsById(cpf)){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Não foi encontrada nenhuma pessoa " +
-                            "com este CPF");
+        if (!pessoaService.existsById(cpf)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não foi encontrada nenhuma pessoa com este CPF");
         }
+
         pessoaService.deleteById(cpf);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body("Pessoa deletada.");
+
+        return ResponseEntity.status(HttpStatus.OK).body("Pessoa deletada.");
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Object> update(@PathVariable(value = "id") Long id, @RequestBody @Valid UsuarioDTO usuarioDTO) {
+        if (!pessoaService.existsById(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario não encontrado");
+        }
+
+        Usuario usuario = pessoaService.findById(id).get();
+        BeanUtils.copyProperties(usuarioDTO, usuario, "id");
+
+        return ResponseEntity.status(HttpStatus.OK).body(pessoaService.save(usuario));
+    }
+
 }

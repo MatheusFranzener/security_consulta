@@ -15,8 +15,8 @@ import java.util.Optional;
 public class LivroService {
     private LivroRepository livroRepository;
 
-    public Livro save(Livro livro){
-        return livroRepository.save(livro);
+    public <S extends Livro> S save(S entity) {
+        return livroRepository.save(entity);
     }
 
     @Transactional

@@ -1,9 +1,12 @@
 package br.senai.sc.security_consulta.controller;
 
+import br.senai.sc.security_consulta.model.dto.LivroDTO;
 import br.senai.sc.security_consulta.model.entities.Autor;
 import br.senai.sc.security_consulta.model.entities.Livro;
 import br.senai.sc.security_consulta.service.LivroService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -19,13 +22,14 @@ import java.util.Optional;
 @AllArgsConstructor
 @RequestMapping("/editora-livros/livro")
 @RestController
+@CrossOrigin
 public class LivroController {
 
     private LivroService livroService;
 
     @GetMapping("/isbn/{isbn}")
     public ResponseEntity<Object> findById(@PathVariable(value = "isbn") Long isbn) {
-        Optional<Livro> livroOptional =  livroService.findById(isbn);
+        Optional<Livro> livroOptional = livroService.findById(isbn);
 
         if (livroOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("O livro de ISBN " + isbn + " não foi encontrado.");
@@ -35,28 +39,34 @@ public class LivroController {
         return ResponseEntity.status(HttpStatus.OK).body(livroOptional.get());
     }
 
-    @GetMapping("/autor/{autor}")
-    public ResponseEntity<List<Livro>> findByAutor(@PathVariable(value = "autor") Autor autor) {
-        return ResponseEntity.status(HttpStatus.FOUND).body(livroService.findByAutor(autor));
-    }
-
     @GetMapping
     public ResponseEntity<List<Livro>> findAll() {
         return ResponseEntity.status(HttpStatus.OK).body(livroService.findAll());
     }
 
-//    @PostMapping
-//    public ResponseEntity<Object> save(@RequestParam("livro") String livroJson) {
-//        if (livroService.existsById(livro.getIsbn())){
-//            return ResponseEntity.status(HttpStatus.CONFLICT).body(
-//                    "Há um livro com o ISBN " + livro.getIsbn() + " cadastrado.");
-//        }
-//        System.out.println(files);
-//        livro.setArquivos(livroUtil.convertMultiPartFilesToArquivos(files));
-//        livro.setStatus(Status.AGUARDANDO_REVISAO);
-//        return ResponseEntity.status(HttpStatus.OK).body(
-//                livroService.save(livro));
-//    }
+    @PostMapping
+    public ResponseEntity<Object> save(@RequestBody @Valid LivroDTO livroDTO) {
+        if (livroService.existsById(livroDTO.getIsbn())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Há um livro com o ISBN " + livroDTO.getIsbn() + " cadastrado.");
+        }
+
+        Livro livro = new Livro();
+        BeanUtils.copyProperties(livroDTO, livro);
+
+        return ResponseEntity.status(HttpStatus.OK).body(livroService.save(livro));
+    }
+
+    @PutMapping("/{isbn}")
+    public ResponseEntity<Object> update(@PathVariable(value = "isbn") Long isbn, @RequestBody @Valid LivroDTO livroDTO) {
+        if (!livroService.existsById(isbn)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Livro não encontrado");
+        }
+
+        Livro livro = livroService.findById(isbn).get();
+        BeanUtils.copyProperties(livroDTO, livro, "id");
+
+        return ResponseEntity.status(HttpStatus.OK).body(livroService.save(livro));
+    }
 
     @DeleteMapping("/{isbn}")
     public ResponseEntity<Object> deleteById(@PathVariable(value = "isbn") Long isbn) {
@@ -67,19 +77,5 @@ public class LivroController {
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Livro não encontrado.");
     }
-
-//    @PutMapping("/{isbn}")
-//    public ResponseEntity<Object> update(@PathVariable(value = "isbn") Long isbn, @RequestParam("livro") String livroJson) {
-//        LivroUtil util = new LivroUtil();
-//        Livro livro = util.convertJsonToModel(livroJson);
-//        if (livroService.existsById(isbn)){
-//            return ResponseEntity.status(HttpStatus.CONFLICT).body(
-//                    "Há um livro com o ISBN " + livro.getIsbn() + " cadastrado.");
-//        }
-//
-//        livro.setArquivos(livroUtil.convertMultiPartFilesToArquivos(files));
-//        return ResponseEntity.status(HttpStatus.OK).body(
-//                livroService.save(livro));
-//    }
 
 }
