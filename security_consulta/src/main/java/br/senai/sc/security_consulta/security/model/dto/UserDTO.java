@@ -10,8 +10,10 @@ import lombok.NonNull;
 @NoArgsConstructor
 public class UserDTO {
 
+    @NonNull
     private String email;
 
+    @NonNull
     private String senha;
 
 }

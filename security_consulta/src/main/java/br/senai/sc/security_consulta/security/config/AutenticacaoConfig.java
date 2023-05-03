@@ -2,6 +2,9 @@ package br.senai.sc.security_consulta.security.config;
 
 import br.senai.sc.security_consulta.security.filter.AutenticacaoFiltro;
 import br.senai.sc.security_consulta.security.service.JpaService;
+import br.senai.sc.security_consulta.security.utils.CookieUtils;
+import br.senai.sc.security_consulta.security.utils.TokenUtils;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,9 +24,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
 
 @Configuration
+@AllArgsConstructor
 public class AutenticacaoConfig {
 
-    @Autowired
     private JpaService jpaService;
 
     @Autowired
@@ -63,6 +66,8 @@ public class AutenticacaoConfig {
                 .requestMatchers(HttpMethod.POST, "/editora-livros/usuario").hasAnyAuthority("Autor", "Revisor")
                 .requestMatchers(HttpMethod.GET, "/editora-livros/usuario/{id}").hasAnyAuthority("Autor", "Revisor")
                 .requestMatchers(HttpMethod.GET, "/editora-livros/livro").hasAuthority("Autor")
+
+
                 .requestMatchers(HttpMethod.DELETE, "/editora-livros/livro/{isbn}").hasAuthority("Revisor")
                 .anyRequest().authenticated();
 
@@ -74,8 +79,9 @@ public class AutenticacaoConfig {
                 .deleteCookies("jwt", "user")
                 .permitAll();
 
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and().addFilterBefore(new AutenticacaoFiltro(), UsernamePasswordAuthenticationFilter.class);
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
+        http.addFilterBefore(new AutenticacaoFiltro(new CookieUtils(), new TokenUtils(), jpaService), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

@@ -16,6 +16,8 @@ import java.util.Collection;
 import java.util.List;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @JsonDeserialize(using = UserJpaDesializer.class)
 public class UserJpa implements UserDetails {
 
@@ -23,34 +25,28 @@ public class UserJpa implements UserDetails {
 
     private Collection<GrantedAuthority> authorities;
 
-    private boolean accountNonExpired = true;
+    private boolean accountNonExpired;
 
-    private boolean accountNonLocked = true;
+    private boolean accountNonLocked;
 
-    private boolean credentialsNonExpired = true;
+    private boolean credentialsNonExpired;
 
-    private boolean enabled = true;
+    private boolean enabled;
+
+    private String password;
+
+    private String username;
 
     public UserJpa(Usuario usuario) {
         this.usuario = usuario;
-    }
-
-    @Override
-    public String getPassword() {
-        return usuario.getSenha();
-    }
-
-    @Override
-    public String getUsername() {
-        return usuario.getEmail();
-    }
-
-    @Override
-    public Collection<GrantedAuthority> getAuthorities() {
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(this.getUsuario().getClass().getSimpleName()));
-
-        return authorities;
+        this.accountNonExpired = true;
+        this.accountNonLocked = true;
+        this.credentialsNonExpired = true;
+        this.enabled = true;
+        this.password = usuario.getSenha();
+        this.username = usuario.getEmail();
+        this.authorities = new ArrayList<>();
+        this.authorities.add(new SimpleGrantedAuthority(usuario.getClass().getSimpleName()));
     }
 
 }

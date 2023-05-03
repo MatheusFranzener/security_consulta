@@ -3,6 +3,7 @@ package br.senai.sc.security_consulta.service;
 import br.senai.sc.security_consulta.model.entities.Autor;
 import br.senai.sc.security_consulta.model.entities.Livro;
 import br.senai.sc.security_consulta.repository.LivroRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class LivroService {
     private LivroRepository livroRepository;
 
