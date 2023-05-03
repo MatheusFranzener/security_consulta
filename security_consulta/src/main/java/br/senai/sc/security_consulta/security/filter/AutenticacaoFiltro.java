@@ -51,8 +51,8 @@ public class AutenticacaoFiltro extends OncePerRequestFilter {
     }
 
     private void validarUrl(String url) throws UrlNaoPermitida {
-        if (!(url.equals("/editora-livros-api/login/auth")
-                || url.equals("/editora-livros-api/logout")
+        if (!(url.equals("/editora-livros/login/auth")
+                || url.equals("/editora-livros/logout")
                 || url.equals("http://localhost:3000/login")
                 || url.equals("https://localhost:3000/login")
                 || url.startsWith("/api-docs")
