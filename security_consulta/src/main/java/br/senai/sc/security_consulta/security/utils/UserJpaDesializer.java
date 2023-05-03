@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+// Classe para transformar o JSON em um objeto do tipo UserJpa
+// Utilizada somente se der algum erro nas permissões quando vai fazer algo
 public class UserJpaDesializer extends JsonDeserializer<UserJpa> {
 
     @Override

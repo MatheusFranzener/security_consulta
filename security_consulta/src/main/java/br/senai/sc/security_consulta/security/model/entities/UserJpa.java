@@ -18,7 +18,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonDeserialize(using = UserJpaDesializer.class)
+@JsonDeserialize(using = UserJpaDesializer.class) // Apenas usar se der erro quando for fazer determinada permissão ( ex: cadastrar somente o usuário e não der certo )
 public class UserJpa implements UserDetails {
 
     private Usuario usuario;
@@ -37,6 +37,7 @@ public class UserJpa implements UserDetails {
 
     private String username;
 
+    // Criando um construtor mais facilitado para o Spring Security
     public UserJpa(Usuario usuario) {
         this.usuario = usuario;
         this.accountNonExpired = true;
@@ -46,6 +47,7 @@ public class UserJpa implements UserDetails {
         this.password = usuario.getSenha();
         this.username = usuario.getEmail();
         this.authorities = new ArrayList<>();
+        // questão do tipo do usuário
         this.authorities.add(new SimpleGrantedAuthority(usuario.getClass().getSimpleName()));
     }
 

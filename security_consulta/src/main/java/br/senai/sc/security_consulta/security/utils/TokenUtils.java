@@ -12,6 +12,7 @@ public class TokenUtils {
 
     private final String senhaForte = "05a9e62653eb0eaa116a1b8bbc06dd30ab0df73ab8ae16a500c80875e6e6c8a9";
 
+    // Função para gerar um token de autenticacao
     public String gerarToken(UserJpa usuario) {
         return Jwts.builder()
                 .setIssuer("Editora Livros")
@@ -22,6 +23,7 @@ public class TokenUtils {
                 .compact();
     }
 
+    // função para validar o token de autenticacao
     public void validarToken(String token) {
         try {
             Jwts.parser().setSigningKey(senhaForte).parseClaimsJws(token);
