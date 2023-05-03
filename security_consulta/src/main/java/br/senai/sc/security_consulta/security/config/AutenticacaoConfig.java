@@ -14,6 +14,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -31,7 +32,7 @@ public class AutenticacaoConfig {
 
     @Autowired
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(jpaService).passwordEncoder(NoOpPasswordEncoder.getInstance());
+        auth.userDetailsService(jpaService).passwordEncoder(new BCryptPasswordEncoder());
     }
 
     @Bean
@@ -57,17 +58,15 @@ public class AutenticacaoConfig {
         http.authorizeHttpRequests()
                 .requestMatchers("/editora-livros/login/auth",
                         "/editora-livros/login",
+                        "/editora-livros/usuario",
                         "/api-docs/**",
                         "/swagger.html",
                         "/swagger-ui/**"
                 ).permitAll()
 
                 .requestMatchers(HttpMethod.POST, "/editora-livros/livro").hasAuthority("Autor")
-                .requestMatchers(HttpMethod.POST, "/editora-livros/usuario").hasAnyAuthority("Autor", "Revisor")
                 .requestMatchers(HttpMethod.GET, "/editora-livros/usuario/{id}").hasAnyAuthority("Autor", "Revisor")
                 .requestMatchers(HttpMethod.GET, "/editora-livros/livro").hasAuthority("Autor")
-
-
                 .requestMatchers(HttpMethod.DELETE, "/editora-livros/livro/{isbn}").hasAuthority("Revisor")
                 .anyRequest().authenticated();
 
