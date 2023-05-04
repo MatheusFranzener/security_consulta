@@ -12,6 +12,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 public class CookieUtils {
+
     private final TokenUtils tokenUtils = new TokenUtils();
 
     // Função para gerar um cookie armazenando o token de autenticação
@@ -51,9 +52,7 @@ public class CookieUtils {
     public UserJpa getUserCookie(HttpServletRequest request) {
         try {
             Cookie cookie = WebUtils.getCookie(request, "user");
-            String jsonUser = URLDecoder.decode(
-                    cookie.getValue(),
-                    StandardCharsets.UTF_8);
+            String jsonUser = URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8);
             ObjectMapper objectMapper = new ObjectMapper();
             return objectMapper.readValue(jsonUser, UserJpa.class);
         } catch (Exception e) {
